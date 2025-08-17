@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kierunek Gry UNO</title>
+    <style>
+        /* CSS osadzony w pliku HTML */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            overflow: hidden; /* Zapobiega pojawianiu się suwaków */
+        }
+
+        /* Kontener do centrowania zawartości */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        /* Główny, klikalny obszar na środku */
+        #main-display {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 20px;
+            /* Płynne przejście przy kliknięciu dla lepszego efektu */
+            transition: transform 0.15s ease;
+        }
+
+        /* Efekt lekkiego zmniejszenia przy kliknięciu */
+        #main-display:active {
+            transform: scale(0.95);
+        }
+
+        /* Stylizacja emoji */
+        #display-emoji {
+            font-size: 15rem; /* Bardzo duży rozmiar ikonki */
+        }
+
+        /* Stylizacja obrazka karty */
+        #display-card {
+            max-width: 80vw; /* Maksymalna szerokość to 80% szerokości ekranu */
+            max-height: 70vh; /* Maksymalna wysokość to 70% wysokości ekranu */
+            height: auto;
+            display: none; /* Domyślnie ukryty */
+        }
+
+        /* Przełącznik trybu w prawym górnym rogu */
+        #mode-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        #mode-switch:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        #mode-switch img {
+            width: 70px;
+            display: block;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #606770;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="mode-switch" title="Zmień tryb (emoji/karty)">
+        <img src="https://raw.githubusercontent.com/paradokszhp/reverse/main/UNO_Logo.png" alt="UNO Logo">
+    </button>
+
+    <div class="container">
+        <button id="main-display">
+            <span id="display-emoji">🔃</span>
+            <img id="display-card" src="" alt="Karta zmiany kierunku">
+        </button>
+        <p id="direction-text">Kierunek gry</p>
+    </div>
+
+    <script>
+        // === ELEMENTY STRONY ===
+        const mainDisplay = document.getElementById('main-display');
+        const displayEmoji = document.getElementById('display-emoji');
+        const displayCard = document.getElementById('display-card');
+        const modeSwitch = document.getElementById('mode-switch');
+        
+        // === DANE ===
+        // Ikony Emoji
+        const clockwiseEmoji = '🔃';
+        const counterClockwiseEmoji = '🔄';
+
+        // URL do obrazków kart (ważne: używamy linków "raw", a nie do strony github)
+        const clockwiseCards = [
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/BR.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/GR.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/RR.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/YR.png'
+        ];
+        const counterClockwiseCards = [
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/BL.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/GL.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/RL.png',
+            'https://raw.githubusercontent.com/paradokszhp/reverse/main/YL.png'
+        ];
+
+        // === ZMIENNE STANU ===
+        let isClockwise = true;
+        let currentMode = 'emoji'; // Dwa tryby: 'emoji' lub 'card'
+
+        // === FUNKCJE ===
+
+        /** Funkcja losująca losowy element z podanej tablicy */
+        function getRandomItem(arr) {
+            const randomIndex = Math.floor(Math.random() * arr.length);
+            return arr[randomIndex];
+        }
+
+        /** Główna funkcja aktualizująca wygląd na podstawie stanu */
+        function updateDisplay() {
+            if (currentMode === 'emoji') {
+                // Tryb Emoji
+                displayCard.style.display = 'none';
+                displayEmoji.style.display = 'block';
+                displayEmoji.textContent = isClockwise ? clockwiseEmoji : counterClockwiseEmoji;
+            } else {
+                // Tryb Kart
+                displayEmoji.style.display = 'none';
+                displayCard.style.display = 'block';
+                const cardSet = isClockwise ? clockwiseCards : counterClockwiseCards;
+                displayCard.src = getRandomItem(cardSet);
+            }
+        }
+
+        // === NASŁUCHIWANIE ZDARZEŃ (EVENT LISTENERS) ===
+
+        /** Zmiana kierunku po kliknięciu na środek ekranu */
+        mainDisplay.addEventListener('click', () => {
+            isClockwise = !isClockwise; // Odwróć kierunek
+            updateDisplay(); // Zaktualizuj widok
+        });
+
+        /** Zmiana trybu po kliknięciu na logo UNO */
+        modeSwitch.addEventListener('click', () => {
+            // Zmień tryb na przeciwny
+            currentMode = (currentMode === 'emoji') ? 'card' : 'emoji';
+            updateDisplay(); // Zaktualizuj widok
+        });
+
+        // Inicjalizacja - ustaw poprawny widok przy pierwszym załadowaniu strony
+        updateDisplay();
+    </script>
+
+</body>
+</html>
